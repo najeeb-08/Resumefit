@@ -5,7 +5,7 @@ Paste your resume and a job description and get an instant **match score**, the 
 **Live demo:** https://najeeb-08.github.io/Resumefit/
 
 
-![ResumeFit screenshot](screenshot.png)
+![ResumeFit screenshot](Screenshot.png)
 
 
 ## Why I built it
