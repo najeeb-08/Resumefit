@@ -4,9 +4,9 @@ Paste your resume and a job description and get an instant **match score**, the 
 
 **Live demo:** https://najeeb-08.github.io/Resumefit/
 
-<!-- Add a screenshot after your site is live: upload screenshot.png to this repo, then delete this line and the arrows around the next one.
+
 ![ResumeFit screenshot](screenshot.png)
--->
+
 
 ## Why I built it
 Applying to jobs, I wanted to know how well my resume matched each role before hitting "Apply". ResumeFit gives that answer in seconds, and because it runs entirely in the browser, your resume never leaves your device.
