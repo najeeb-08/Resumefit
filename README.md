@@ -2,9 +2,11 @@
 
 Paste your resume and a job description and get an instant **match score**, the **skills you're missing**, the **keywords to add**, and **tips to improve** your resume.
 
-**Live demo:** https://najeeb-08.github.io/resumefit/
+**Live demo:** https://najeeb-08.github.io/Resumefit/
 
-![screenshot](screenshot.png)
+<!-- Add a screenshot after your site is live: upload screenshot.png to this repo, then delete this line and the arrows around the next one.
+![ResumeFit screenshot](screenshot.png)
+-->
 
 ## Why I built it
 Applying to jobs, I wanted to know how well my resume matched each role before hitting "Apply". ResumeFit gives that answer in seconds, and because it runs entirely in the browser, your resume never leaves your device.
@@ -23,20 +25,16 @@ It also runs simple resume-quality checks (measurable results, section headings,
 ## Tech stack
 - Vanilla JavaScript (no frameworks, no build step)
 - NLP techniques: tokenization, stop-word removal, TF-style vectors, cosine similarity
-- Responsive UI with dark and light mode
+- HTML5 and CSS3, responsive layout with dark and light mode
+- Hosted on GitHub Pages
 
 ## Run locally
-```bash
-git clone https://github.com/najeeb-08/resumefit.git
-cd resumefit
-# just open index.html in your browser, or:
+````bash
+git clone https://github.com/najeeb-08/Resumefit.git
+cd Resumefit
+# open index.html in your browser, or:
 npx serve .
-```
-
-## Deploy free (GitHub Pages)
-1. Push these files to a GitHub repo.
-2. Repo → **Settings → Pages** → Source: `main` branch, `/ (root)` → Save.
-3. Your site goes live at `https://najeeb-08.github.io/resumefit/`.
+````
 
 ## Roadmap
 - [ ] Upgrade matching with sentence embeddings (sentence-transformers) behind a FastAPI backend
@@ -45,7 +43,11 @@ npx serve .
 - [ ] ATS-style formatting checks
 
 ## Limitations
-Skill detection uses a built-in dictionary of ~60 skills, so niche skills may be missed. The score is a guide, not a guarantee.
+Skill detection uses a built-in dictionary of about 60 skills, so niche skills may be missed. The score is a guide, not a guarantee.
 
 ## Author
 Built by **Najeebullah N** · [GitHub](https://github.com/najeeb-08) · [LinkedIn](https://linkedin.com/in/your-profile)
+````
+````
+
+Copy everything inside the box. Before you commit, replace `https://linkedin.com/in/your-profile` with your real LinkedIn URL.
