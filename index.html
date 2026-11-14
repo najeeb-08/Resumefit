@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ResumeFit – AI Resume to Job Matcher</title>
+<meta name="description" content="Paste your resume and a job description. Get an instant match score, missing skills and improvement tips. Runs 100% in your browser." />
+<style>
+  :root {
+    --bg: #0b1020; --panel: #131a30; --panel2: #1a2340; --text: #e8ecf8; --muted: #93a0c4;
+    --accent: #6c8cff; --accent2: #9b6cff; --good: #2ecc8f; --warn: #ffb547; --bad: #ff6b81; --border: #25305a;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f4f6fc; --panel:#ffffff; --panel2:#eef1fb; --text:#161c33; --muted:#5b668a; --border:#dbe1f3; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height:1.5; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px 60px; }
+  header { padding: 40px 0 24px; text-align:center; }
+  .logo { display:inline-flex; gap:10px; align-items:center; font-weight:800; font-size:1.6rem; letter-spacing:-.02em; }
+  .logo span.dot { width:14px; height:14px; border-radius:50%; background: linear-gradient(135deg,var(--accent),var(--accent2)); display:inline-block; }
+  header p { color: var(--muted); max-width: 620px; margin: 10px auto 0; }
+  .badge { display:inline-block; margin-top:14px; font-size:.78rem; padding:4px 10px; border:1px solid var(--border); border-radius:99px; color:var(--muted); }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; }
+  label { font-weight:600; font-size:.9rem; display:flex; justify-content:space-between; margin-bottom:8px; }
+  label small { color: var(--muted); font-weight:400; }
+  textarea { width:100%; min-height:260px; resize:vertical; background: var(--panel2); color: var(--text); border:1px solid var(--border); border-radius:10px; padding:12px; font: inherit; font-size:.9rem; }
+  textarea:focus { outline:2px solid var(--accent); }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin:16px 0; justify-content:center; }
+  button { font:inherit; cursor:pointer; border-radius:10px; padding:11px 20px; border:1px solid var(--border); background: var(--panel); color: var(--text); font-weight:600; }
+  button.primary { background: linear-gradient(135deg,var(--accent),var(--accent2)); border:none; color:#fff; }
+  button:hover { filter:brightness(1.1); }
+  #error { color: var(--bad); text-align:center; min-height:1.4em; font-size:.9rem; }
+  #results { display:none; margin-top:8px; }
+  .score-row { display:grid; grid-template-columns: 220px 1fr; gap:16px; align-items:center; }
+  @media (max-width: 760px) { .score-row { grid-template-columns: 1fr; justify-items:center; text-align:center; } }
+  .ring { position:relative; width:180px; height:180px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .num { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring .num b { font-size:2.8rem; line-height:1; }
+  .ring .num span { color: var(--muted); font-size:.8rem; }
+  .bars { width:100%; }
+  .bar { margin:10px 0; }
+  .bar .top { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); }
+  .track { height:8px; background: var(--panel2); border-radius:99px; overflow:hidden; margin-top:4px; }
+  .fill { height:100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; width:0; transition: width .8s ease; }
+  h3 { margin:0 0 10px; font-size:1rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { padding:5px 11px; border-radius:99px; font-size:.82rem; border:1px solid; }
+  .chip.good { color: var(--good); border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
+  .chip.bad { color: var(--bad); border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
+  .chip.neutral { color: var(--muted); border-color: var(--border); }
+  .empty { color: var(--muted); font-size:.88rem; }
+  ul.tips { margin:0; padding-left:20px; } ul.tips li { margin:8px 0; }
+  .mt { margin-top:16px; }
+  footer { text-align:center; color: var(--muted); font-size:.82rem; margin-top:40px; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="dot"></span> ResumeFit</div>
+    <p>Paste your resume and a job description. Get an instant match score, the skills you're missing, and tips to improve your resume.</p>
+    <span class="badge">🔒 100% private: runs in your browser, nothing is uploaded</span>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <label for="resume">Your resume <small id="rc">0 words</small></label>
+      <textarea id="resume" placeholder="Paste your resume text here…"></textarea>
+    </div>
+    <div class="card">
+      <label for="jd">Job description <small id="jc">0 words</small></label>
+      <textarea id="jd" placeholder="Paste the job description here…"></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="go">Analyze match</button>
+    <button id="sample">Try sample</button>
+    <button id="clear">Clear</button>
+  </div>
+  <div id="error" role="alert"></div>
+
+  <div id="results">
+    <div class="card">
+      <div class="score-row">
+        <div class="ring">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="78" fill="none" stroke="var(--panel2)" stroke-width="14"/>
+            <circle id="arc" cx="90" cy="90" r="78" fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490" style="transition: stroke-dashoffset .9s ease"/>
+            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c8cff"/><stop offset="1" stop-color="#9b6cff"/></linearGradient></defs>
+          </svg>
+          <div class="num"><b id="score">0</b><span id="label"></span></div>
+        </div>
+        <div class="bars">
+          <div class="bar"><div class="top"><span>Skill coverage</span><span id="v1"></span></div><div class="track"><div class="fill" id="f1"></div></div></div>
+          <div class="bar"><div class="top"><span>Keyword coverage</span><span id="v2"></span></div><div class="track"><div class="fill" id="f2"></div></div></div>
+          <div class="bar"><div class="top"><span>Text similarity</span><span id="v3"></span></div><div class="track"><div class="fill" id="f3"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid mt">
+      <div class="card"><h3>✅ Skills you match</h3><div class="chips" id="matched"></div></div>
+      <div class="card"><h3>⚠️ Skills to add / learn</h3><div class="chips" id="missing"></div></div>
+    </div>
+    <div class="grid mt">
+      <div class="card"><h3>🔑 Missing keywords</h3><div class="chips" id="kw"></div></div>
+      <div class="card"><h3>➕ Extra skills you have</h3><div class="chips" id="extra"></div></div>
+    </div>
+    <div class="card mt"><h3>💡 How to improve</h3><ul class="tips" id="tips"></ul></div>
+    <div class="actions"><button id="copy">Copy report</button></div>
+  </div>
+
+  <footer>Built with vanilla JS · TF-IDF-style cosine similarity + skill extraction · <a href="https://github.com/" target="_blank" rel="noopener">View source on GitHub</a></footer>
+</div>
+
+<script src="matcher.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const SAMPLE_RESUME = `Priya Sharma | priya@email.com | github.com/priya | linkedin.com/in/priya
+Computer Science Engineering graduate with experience in machine learning and web development.
+
+Skills: Python, scikit-learn, Pandas, NumPy, HTML, CSS, JavaScript, Git, GitHub, Canva, Figma
+
+Projects
+- Built a spam classifier in Python using scikit-learn, reaching 94% accuracy on 5,000 emails.
+- Designed and launched a portfolio website with responsive design; used by 300+ visitors.
+- Created 100+ social media graphics in Canva and Figma for small businesses.
+
+Education: B.E. Computer Science Engineering`;
+const SAMPLE_JD = `We are hiring a Junior ML / Web Engineer.
+Responsibilities: build machine learning models in Python, expose them via REST APIs using FastAPI, and build clean React frontends.
+Requirements: Python, scikit-learn, Pandas, SQL, JavaScript, React, Git, Docker. Knowledge of NLP and UI/UX is a plus.
+You will collaborate with designers and product managers in an agile team.`;
+
+const words = (s) => (s.trim() ? s.trim().split(/\s+/).length : 0);
+const updateCounts = () => { $("rc").textContent = words($("resume").value) + " words"; $("jc").textContent = words($("jd").value) + " words"; };
+$("resume").addEventListener("input", updateCounts);
+$("jd").addEventListener("input", updateCounts);
+
+function chips(el, items, cls) {
+  el.innerHTML = "";
+  if (!items.length) { el.innerHTML = '<span class="empty">Nothing here 🎉</span>'; return; }
+  items.forEach((t) => { const s = document.createElement("span"); s.className = "chip " + cls; s.textContent = t; el.appendChild(s); });
+}
+function bar(i, v) {
+  $("v" + i).textContent = v === null ? "n/a" : v + "%";
+  requestAnimationFrame(() => ($("f" + i).style.width = (v || 0) + "%"));
+}
+
+let last = null;
+$("go").onclick = () => {
+  $("error").textContent = "";
+  try {
+    const r = ResumeFit.analyze($("resume").value, $("jd").value);
+    last = r;
+    $("results").style.display = "block";
+    $("score").textContent = r.score;
+    $("label").textContent = r.label;
+    $("arc").style.strokeDashoffset = 490 - (490 * r.score) / 100;
+    bar(1, r.breakdown.skillCoverage); bar(2, r.breakdown.keywordCoverage); bar(3, r.breakdown.textSimilarity);
+    chips($("matched"), r.matchedSkills, "good");
+    chips($("missing"), r.missingSkills, "bad");
+    chips($("kw"), r.missingKeywords.slice(0, 15), "neutral");
+    chips($("extra"), r.extraSkills, "neutral");
+    $("tips").innerHTML = "";
+    r.tips.forEach((t) => { const li = document.createElement("li"); li.textContent = t; $("tips").appendChild(li); });
+    $("results").scrollIntoView({ behavior: "smooth" });
+  } catch (e) { $("error").textContent = e.message; }
+};
+$("sample").onclick = () => { $("resume").value = SAMPLE_RESUME; $("jd").value = SAMPLE_JD; updateCounts(); $("go").click(); };
+$("clear").onclick = () => { $("resume").value = ""; $("jd").value = ""; updateCounts(); $("results").style.display = "none"; $("error").textContent = ""; };
+$("copy").onclick = async () => {
+  if (!last) return;
+  const t = `ResumeFit report\nMatch: ${last.score}/100 (${last.label})\nMatched: ${last.matchedSkills.join(", ") || "-"}\nMissing: ${last.missingSkills.join(", ") || "-"}\nTips:\n- ${last.tips.join("\n- ")}`;
+  try { await navigator.clipboard.writeText(t); $("copy").textContent = "Copied ✓"; setTimeout(() => ($("copy").textContent = "Copy report"), 1500); } catch { $("error").textContent = "Couldn't copy, select and copy manually."; }
+};
+</script>
+</body>
+</html>
