@@ -73,4 +73,4 @@ npx serve .
 Skill detection uses a built-in dictionary of about 65 skills, so niche skills may be missed. Scores are guides, not guarantees.
 
 ## Author
-Built by **Najeebullah N** · [GitHub](https://github.com/najeeb-08) · [LinkedIn]([https://linkedin.com/in/your-profile](https://www.linkedin.com/in/najeebullah-n-331487278/))
+Built by **Najeebullah N** · [GitHub](https://github.com/najeeb-08) · [LinkedIn](https://www.linkedin.com/in/najeebullah-n-331487278/)
