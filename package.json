@@ -1,0 +1,13 @@
+{
+  "name": "resumefit",
+  "version": "2.1.0",
+  "description": "Resume to job matcher with ATS score, skill gap planner and CSV ranking. Runs in the browser.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
